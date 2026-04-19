@@ -8,13 +8,23 @@ export async function POST(req: Request) {
   }
 
   try {
-    console.log("MESSAGE",message)
+    const token = process.env.HUGGING_FACE_API;
+    if (!token) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing server config. Set HUGGING_FACE_API in your environment to enable AI replies.",
+        },
+        { status: 503 }
+      );
+    }
+
     const response = await fetch(
       "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.HUGGING_FACE_API}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ inputs: message }),
@@ -22,8 +32,30 @@ export async function POST(req: Request) {
     );
 
     const data = await response.json();
-    console.log("DATA___",data)
-    return NextResponse.json(data);
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          error:
+            (typeof data?.error === "string" && data.error) ||
+            "AI service request failed.",
+          detail: data,
+        },
+        { status: response.status }
+      );
+    }
+
+    // HF responses vary by model; normalize to a simple shape for the client.
+    const generated =
+      (Array.isArray(data) && data[0]?.generated_text) || data?.generated_text;
+
+    return NextResponse.json({
+      generated_text:
+        typeof generated === "string" && generated.trim().length > 0
+          ? generated
+          : null,
+      raw: data,
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Something went wrong" },
