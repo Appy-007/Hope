@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.64",
+    "@langchain/core": "^1.1.48",
+    "@langchain/groq": "^1.2.1",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-scroll-area": "^1.2.9",
     "@radix-ui/react-slot": "^1.2.3",
+    "ai": "^6.0.168",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.18.2",

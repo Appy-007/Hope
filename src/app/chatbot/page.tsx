@@ -31,6 +31,46 @@ const faqData = [
 
 const fuse = new Fuse(faqData, { keys: ["question"], threshold: 0.4 });
 
+function isStrayAnimalRelated(message: string) {
+  const text = message.toLowerCase();
+  const keywords = [
+    "stray",
+    "street dog",
+    "street cat",
+    "dog",
+    "puppy",
+    "cat",
+    "kitten",
+    "rabies",
+    "bite",
+    "wound",
+    "injury",
+    "bleeding",
+    "limp",
+    "vomit",
+    "diarrhea",
+    "not eating",
+    "weak",
+    "fever",
+    "mange",
+    "ticks",
+    "fleas",
+    "deworm",
+    "spay",
+    "neuter",
+    "steril",
+    "vaccin",
+    "food",
+    "water",
+    "rescue",
+    "ngo",
+    "ambulance",
+    "vet",
+    "animal",
+  ];
+  return keywords.some((k) => text.includes(k));
+}
+
 export default function HomePage() {
   const [messages, setMessages] = useState<
     { id: string; role: "user" | "bot"; text: string }[]
@@ -57,6 +97,22 @@ export default function HomePage() {
     if (!input.trim()) return;
 
     const text = input.trim();
+
+    if (!isStrayAnimalRelated(text)) {
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), role: "user", text },
+        {
+          id: crypto.randomUUID(),
+          role: "bot",
+          text:
+            "I can only help with **stray animal care** (dogs/cats) — first-aid, feeding, safety, and when to contact an NGO/vet.\n\nPlease rephrase with the animal details (dog/cat, symptoms, and your Kolkata area/landmark).",
+        },
+      ]);
+      setInput("");
+      return;
+    }
+
     setMessages((prev) => [
       ...prev,
       { id: crypto.randomUUID(), role: "user", text },
@@ -92,7 +148,7 @@ export default function HomePage() {
         ...prev,
         { id: crypto.randomUUID(), role: "bot", text: botReply },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -134,7 +190,7 @@ export default function HomePage() {
               ) : null}
             </div>
 
-            <ScrollArea className="flex-1 px-5 py-4">
+            <ScrollArea className="flex-1 min-h-0 px-5 py-4">
               <div className="space-y-3">
                 {messages.length === 0 ? (
                   <div className="rounded-xl border bg-secondary/40 p-4 text-sm text-muted-foreground">
@@ -148,7 +204,7 @@ export default function HomePage() {
                     className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
+                      className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm shadow-sm break-words ${
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground"
