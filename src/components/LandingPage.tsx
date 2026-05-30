@@ -16,7 +16,7 @@ export default function LandingPage() {
           Rescue. Heal. Rehome.
         </h1>
         <p className="text-lg md:text-xl max-w-xl">
-          Join us in giving stray animals a second chance at life.
+          Be the reason a stray finds hope today.
         </p>
       </div>
     </div>

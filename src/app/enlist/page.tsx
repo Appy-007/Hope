@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Cat, Info, Check, Loader2, Sparkles } from "lucide-react";
+import { Info, Check, Loader2, Sparkles, HeartHandshake, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -121,12 +121,12 @@ export default function EnlistNgoPage() {
           Enlist Your Animal NGO
         </h1>
         <p className="text-muted-foreground text-base md:text-lg max-w-3xl">
-          Join Hope&apos;s directory of animal welfare organizations in Kolkata. Help community members find your organization when stray dogs, cats, cows, or goats in your area need immediate support.
+          Join Hope&apos;s directory of animal welfare organizations in Kolkata. Help community members find your organization when stray animals in your area need immediate rescue or medical support.
         </p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
-        {/* Left Column: Educational Content & Beautiful Animal Placeholders */}
+        {/* Left Column: Educational Content & Who Can Enlist */}
         <div className="lg:col-span-5 space-y-6">
           <Card className="border-primary/20 bg-primary/5">
             <CardHeader className="pb-3">
@@ -140,59 +140,41 @@ export default function EnlistNgoPage() {
                 Hope connects local citizens with nearby rescue teams. By registering, you make your organization visible to users in your immediate locality.
               </p>
               <p className="font-semibold text-foreground/90">
-                We advocate for all stray animals in Kolkata, not just dogs:
+                Support for all rescue initiatives:
               </p>
-              <ul className="space-y-1.5 pl-3 list-disc text-xs">
-                <li>Stray dogs needing medical, feeding, or spaying assistance.</li>
-                <li>Injured or orphaned street cats and kittens.</li>
-                <li>Abandoned cows requiring veterinary aid or shelter transfer.</li>
-                <li>Stray goats and farm animals needing protection.</li>
-              </ul>
+              <p className="text-xs">
+                Whether your organization helps dogs, cats, large animals, birds, or wildlife, you are welcome here. If you provide any form of immediate care, first-aid, sterilization, or shelter, enlisting helps citizens connect with you in critical moments.
+              </p>
             </CardContent>
           </Card>
 
-          {/* Styled Image placeholders for Cats, Cows, and Goats */}
+          {/* Who Can Enlist */}
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground text-sm tracking-wide uppercase">
-              Animals We Support
+              Who Can Enlist?
             </h3>
 
-            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-              {/* Cat Placeholder */}
-              <div className="flex items-center gap-4 rounded-xl border border-dashed border-border bg-card p-4 transition-all hover:bg-muted/30">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
-                  <Cat className="size-7" />
+            <div className="grid gap-3 lg:grid-cols-1">
+              <div className="flex items-start gap-4 rounded-xl border border-dashed border-border bg-card p-4 transition-all hover:bg-muted/30">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                  <HeartHandshake className="size-6" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm text-foreground">Street Cats & Kittens</h4>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    Feline rescue, sterilization program assistance, and colony feeding guidance.
+                  <h4 className="font-semibold text-sm text-foreground">Any Animal Rescue or Shelter</h4>
+                  <p className="text-xs text-muted-foreground">
+                    We welcome all organizations—regardless of whether you help dogs, cats, cows, goats, birds, or other animals. If you assist local street animals, you belong in our network.
                   </p>
                 </div>
               </div>
 
-              {/* Cow Placeholder */}
-              <div className="flex items-center gap-4 rounded-xl border border-dashed border-border bg-card p-4 transition-all hover:bg-muted/30">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 font-bold text-xl">
-                  🐮
+              <div className="flex items-start gap-4 rounded-xl border border-dashed border-border bg-card p-4 transition-all hover:bg-muted/30">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400">
+                  <Activity className="size-6" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm text-foreground">Indian Cows & Bulls</h4>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    Large animal veterinary care, gaushala referrals, and traffic accident response.
-                  </p>
-                </div>
-              </div>
-
-              {/* Goat Placeholder */}
-              <div className="flex items-center gap-4 rounded-xl border border-dashed border-border bg-card p-4 transition-all hover:bg-muted/30">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 font-bold text-xl">
-                  🐐
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm text-foreground">Stray Goats</h4>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    Treatment for fractures, shelter support, and safety from commercial exploitation.
+                  <h4 className="font-semibold text-sm text-foreground">Immediate Medical & Care Providers</h4>
+                  <p className="text-xs text-muted-foreground">
+                    If your team provides immediate medical attention, field first-aid, sterilization (ABC) drives, feeding runs, or emergency transport, enlisting makes you visible to caretakers in need.
                   </p>
                 </div>
               </div>

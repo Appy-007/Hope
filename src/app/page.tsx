@@ -2,6 +2,9 @@ import ChatbotSection from "@/components/ChatbotSection";
 import HeroSection2 from "@/components/HeroSection2";
 import LandingPage from "@/components/LandingPage";
 import Vaccination from "@/components/Vaccination";
+import SummerCareSection from "@/components/SummerCareSection";
+import NgoEnlistSection from "@/components/NgoEnlistSection";
+import DisclaimerSection from "@/components/DisclaimerSection";
 import Image from "next/image";
 import Link from "next/link";
 import AnimalCareLogo from "@/assets/animalcarelogo.png"
@@ -28,6 +31,7 @@ export default function Home() {
     <LandingPage/>
     <ChatbotSection/>
     <HeroSection2/>
+    <SummerCareSection/>
     <Vaccination/>
 
     <section className="mx-auto w-full max-w-6xl px-4 py-12">
@@ -78,12 +82,22 @@ export default function Home() {
                   </a>
                 </div>
               ) : null}
+              {ngo.website ? (
+                <div className="text-muted-foreground">
+                  <span className="text-foreground font-medium">Website:</span>{" "}
+                  <a className="underline underline-offset-4" href={ngo.website} target="_blank">
+                    {ngo.website}
+                  </a>
+                </div>
+              ) : null}
               <div className="text-xs text-muted-foreground line-clamp-2">{ngo.address}</div>
             </CardContent>
           </Card>
         ))}
       </div>
     </section>
+    <NgoEnlistSection/>
+    <DisclaimerSection/>
     
     </>
   );
