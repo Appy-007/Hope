@@ -80,19 +80,6 @@ export const KOLKATA_NGOS: Ngo[] = [
     location: { lat: 22.533947, lng: 88.2618433 },
     tags: ["feeding", "treatment", "community"],
   },
-  // {
-  //   id: "compassionate-crusaders-trust",
-  //   name: "Compassionate Crusaders Trust (CCT)",
-  //   description:
-  //     "Rescue + medical care and sterilization/vaccination drives in and around Kolkata.",
-  //   address: "Kolkata, West Bengal (contact for program details)",
-  //   areaHint: "South Kolkata",
-  //   phone: "+913324647030",
-  //   email: "animalcrusader@gmail.com",
-  //   website: "https://www.animalcrusaders.org/",
-  //   location: { lat: 22.514, lng: 88.344 },
-  //   tags: ["rescue", "sterilization", "vaccination", "treatment"],
-  // },
   {
     id: "love-n-care",
     name: "Love n Care for Animals",
@@ -103,7 +90,7 @@ export const KOLKATA_NGOS: Ngo[] = [
     phone: "+913324881222",
     email: "lovencareforanimals@gmail.com",
     website: "https://www.lovencareforanimals.co.in/",
-    location: { lat: 22.494, lng: 88.292 },
+    location: { lat: 22.4782455, lng: 87.6956978 },
     tags: ["rescue", "clinic", "sterilization", "vaccination", "shelter"],
   },
 ];
