@@ -3,6 +3,7 @@ import { ChatGroq } from "@langchain/groq";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { KOLKATA_NGOS } from "@/data/kolkataNgos";
 import Fuse from "fuse.js";
+import { checkRelevancy } from "@/lib/relevancy";
 
 // Initialize Fuse for local NGO RAG retrieval
 const ngoFuse = new Fuse(KOLKATA_NGOS, {
@@ -13,46 +14,6 @@ const ngoFuse = new Fuse(KOLKATA_NGOS, {
 function getRelevantNgos(message: string) {
   const results = ngoFuse.search(message);
   return results.map((r) => r.item);
-}
-
-function isStrayAnimalRelated(message: string) {
-  const text = message.toLowerCase();
-  const keywords = [
-    "stray",
-    "street dog",
-    "street cat",
-    "dog",
-    "puppy",
-    "cat",
-    "kitten",
-    "rabies",
-    "bite",
-    "wound",
-    "injury",
-    "bleeding",
-    "limp",
-    "vomit",
-    "diarrhea",
-    "not eating",
-    "weak",
-    "fever",
-    "mange",
-    "ticks",
-    "fleas",
-    "deworm",
-    "spay",
-    "neuter",
-    "steril",
-    "vaccin",
-    "food",
-    "water",
-    "rescue",
-    "ngo",
-    "ambulance",
-    "vet",
-    "animal",
-  ];
-  return keywords.some((k) => text.includes(k));
 }
 
 export async function POST(req: Request) {
@@ -69,7 +30,8 @@ export async function POST(req: Request) {
     }
 
     // Filter out irrelevant messages to save LLM tokens
-    if (!isStrayAnimalRelated(userMessage)) {
+    const { relevant } = await checkRelevancy(userMessage);
+    if (!relevant) {
       return NextResponse.json({
         generated_text:
           "Sorry, this model is not trained for such questions. I can only assist with topics related to stray animal care (first-aid, feeding, safety) and rescue contacts in Kolkata.",
