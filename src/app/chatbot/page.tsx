@@ -116,17 +116,29 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
       });
+
       const data = await res.json();
+
+      if (!res.ok) {
+        const errMsg = data.error || "Something went wrong. Please try again.";
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), role: "bot", text: errMsg },
+        ]);
+        setLoading(false);
+        return;
+      }
+
       const botReply =
         data?.generated_text ||
-        data?.error ||
         "Sorry — I couldn’t generate a helpful answer. Try rephrasing, or contact a nearby NGO.";
 
       setMessages((prev) => [
         ...prev,
         { id: crypto.randomUUID(), role: "bot", text: botReply },
       ]);
-    } catch {
+    } catch (error) {
+      console.error("AI response fetch error:", error);
       setMessages((prev) => [
         ...prev,
         {

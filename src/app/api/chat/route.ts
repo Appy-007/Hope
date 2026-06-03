@@ -4,6 +4,28 @@ import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { KOLKATA_NGOS } from "@/data/kolkataNgos";
 import Fuse from "fuse.js";
 import { checkRelevancy } from "@/lib/relevancy";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+// Initialize Upstash Redis and Rate Limiter if keys are provided
+let redis: Redis | null = null;
+let ratelimit: Ratelimit | null = null;
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redis = Redis.fromEnv();
+    ratelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(7, "1 m"), // 10 requests per minute
+      analytics: true,
+    });
+  } else {
+    console.warn(
+      "Upstash Redis environment variables are missing. Rate limiting and response caching are disabled."
+    );
+  }
+} catch (error) {
+  console.error("Failed to initialize Upstash Redis/Ratelimit:", error);
+}
 
 // Initialize Fuse for local NGO RAG retrieval
 const ngoFuse = new Fuse(KOLKATA_NGOS, {
@@ -18,6 +40,18 @@ function getRelevantNgos(message: string) {
 
 export async function POST(req: Request) {
   try {
+    // Apply Rate Limiting
+    if (ratelimit) {
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "127.0.0.1";
+      const { success } = await ratelimit.limit(ip);
+      if (!success) {
+        return NextResponse.json(
+          { error: "Too many requests. Please try again in a minute." },
+          { status: 429 }
+        );
+      }
+    }
+
     const { message } = await req.json();
 
     if (!message) {
@@ -27,6 +61,25 @@ export async function POST(req: Request) {
     const userMessage = String(message).trim();
     if (userMessage.length === 0) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    // Check Redis Cache
+    let cacheKey = "";
+    if (redis) {
+      try {
+        const msgBuffer = new TextEncoder().encode(userMessage.toLowerCase());
+        const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+        cacheKey = `cache:chat:${hash}`;
+
+        const cachedResponse = await redis.get<string>(cacheKey);
+        if (cachedResponse) {
+          return NextResponse.json({ generated_text: cachedResponse, cached: true });
+        }
+      } catch (err) {
+        console.error("Redis cache lookup error:", err);
+      }
     }
 
     // Filter out irrelevant messages to save LLM tokens
@@ -102,6 +155,15 @@ export async function POST(req: Request) {
       : Array.isArray(response.content) 
         ? JSON.stringify(response.content).trim() 
         : "";
+
+    // Save response to Redis Cache (expires in 24 hours / 86400 seconds)
+    if (redis && cacheKey && generatedText) {
+      try {
+        await redis.set(cacheKey, generatedText, { ex: 86400 });
+      } catch (err) {
+        console.error("Redis cache set error:", err);
+      }
+    }
 
     return NextResponse.json({ generated_text: generatedText || null });
   } catch (error) {
