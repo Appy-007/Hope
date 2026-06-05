@@ -1,5 +1,5 @@
 import anchorData from "@/data/anchorEmbeddings.json";
-import { getCollection } from "@/lib/vectorDb";
+import { searchSimilar } from "@/lib/vectorDb";
 
 interface AnchorEmbedding {
   text: string;
@@ -77,6 +77,48 @@ function checkLocalSimilarity(queryEmbedding: number[], threshold: number): { re
   };
 }
 
+export function checkIsGreetingOrThanks(message: string): { isMatch: boolean; type: "greeting" | "thanks" | null } {
+  const clean = message.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+  
+  const greetings = new Set([
+    "hi", "hello", "hey", "heyy", "heyyy", "yo", "hola", "greetings", 
+    "good morning", "good afternoon", "good evening", "howdy", "sup"
+  ]);
+  
+  const thanks = new Set([
+    "thanks", "thank you", "thank u", "tysm", "thank you so much", 
+    "thanks a lot", "thankyou", "thx", "appreciate it"
+  ]);
+  
+  if (greetings.has(clean)) {
+    return { isMatch: true, type: "greeting" };
+  }
+  
+  if (thanks.has(clean)) {
+    return { isMatch: true, type: "thanks" };
+  }
+  
+  if (
+    clean.startsWith("hi ") || 
+    clean.startsWith("hello ") || 
+    clean.startsWith("hey ") || 
+    clean.startsWith("good morning ") || 
+    clean.startsWith("good afternoon ") || 
+    clean.startsWith("good evening ")
+  ) {
+    return { isMatch: true, type: "greeting" };
+  }
+  
+  if (
+    clean.startsWith("thanks ") || 
+    clean.startsWith("thank you ")
+  ) {
+    return { isMatch: true, type: "thanks" };
+  }
+  
+  return { isMatch: false, type: null };
+}
+
 export async function checkRelevancy(
   message: string,
   threshold = 0.6
@@ -84,11 +126,21 @@ export async function checkRelevancy(
   relevant: boolean; 
   maxSimilarity: number; 
   isFallback: boolean; 
-  source: "chromadb" | "local_embeddings" | "keyword" 
+  source: "sqlite" | "local_embeddings" | "keyword" 
 }> {
   const text = message.trim();
   if (!text) {
     return { relevant: false, maxSimilarity: 0, isFallback: false, source: "keyword" };
+  }
+
+  const greetThanksCheck = checkIsGreetingOrThanks(text);
+  if (greetThanksCheck.isMatch) {
+    return {
+      relevant: true,
+      maxSimilarity: 1.0,
+      isFallback: false,
+      source: "keyword"
+    };
   }
 
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -138,31 +190,22 @@ export async function checkRelevancy(
     };
   }
 
-  // Attempt Chroma DB search
+  // Attempt SQLite search
   try {
-    const collection = await getCollection();
-    const results = await collection.query({
-      queryEmbeddings: [queryEmbedding],
-      nResults: 1,
-    });
-
-    if (results.distances && results.distances[0] && results.distances[0].length > 0) {
-      const distance = results.distances[0][0]; // Cosine distance (0 to 2)
-      if (distance !== null) {
-        const similarity = 1 - distance; // Cosine similarity
-
-        return {
-          relevant: similarity >= threshold,
-          maxSimilarity: similarity,
-          isFallback: false,
-          source: "chromadb",
-        };
-      }
+    const results = searchSimilar(queryEmbedding, 1);
+    if (results.length > 0) {
+      const similarity = results[0].similarity;
+      return {
+        relevant: similarity >= threshold,
+        maxSimilarity: similarity,
+        isFallback: false,
+        source: "sqlite",
+      };
     } else {
-      console.warn("Chroma DB collection is empty. Falling back to local embedding similarity.");
+      console.warn("SQLite collection is empty. Falling back to local embedding similarity.");
     }
   } catch (error) {
-    console.error("Chroma DB query failed. Falling back to local embedding similarity. Error:", error);
+    console.error("SQLite query failed. Falling back to local embedding similarity. Error:", error);
   }
 
   // Fallback to local embedding similarity check

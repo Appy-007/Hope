@@ -65,7 +65,10 @@ export default function NgoFinderPage() {
     });
 
     enriched.sort((x, y) => {
-      if (x.km == null && y.km == null) return x.ngo.name.localeCompare(y.ngo.name);
+      if (x.km == null && y.km == null) {
+        if (query.trim()) return 0; // Preserve Fuse.js search relevance order
+        return x.ngo.name.localeCompare(y.ngo.name);
+      }
       if (x.km == null) return 1;
       if (y.km == null) return -1;
       return x.km - y.km;

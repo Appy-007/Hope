@@ -3,7 +3,7 @@ import { ChatGroq } from "@langchain/groq";
 import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 import { KOLKATA_NGOS } from "@/data/kolkataNgos";
 import Fuse from "fuse.js";
-import { checkRelevancy } from "@/lib/relevancy";
+import { checkRelevancy, checkIsGreetingOrThanks } from "@/lib/relevancy";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
@@ -61,6 +61,20 @@ export async function POST(req: Request) {
     const userMessage = String(message).trim();
     if (userMessage.length === 0) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
+    }
+
+    // Intercept simple greetings or gratitude responses
+    const greetThanksCheck = checkIsGreetingOrThanks(userMessage);
+    if (greetThanksCheck.isMatch) {
+      if (greetThanksCheck.type === "greeting") {
+        return NextResponse.json({
+          generated_text: "Hello! I am Hope, your stray animal care assistant for Kolkata. How can I help you with a stray dog or cat today?"
+        });
+      } else {
+        return NextResponse.json({
+          generated_text: "You're welcome! I'm glad I could help. Let me know if you need anything else for stray animals in Kolkata."
+        });
+      }
     }
 
     // Check Redis Cache

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
 import dynamic from "next/dynamic";
-import { Bot, SendHorizonal, Sparkles } from "lucide-react";
+import { Bot, SendHorizonal, Sparkles, Trash2 } from "lucide-react";
 
 const MarkdownRenderer = dynamic(() => import("./MarkdownRenderer"), {
   ssr: false,
@@ -56,6 +56,13 @@ export default function HomePage() {
   useEffect(() => {
     listRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
+
+  // Keep only the last 50 messages (25 user, 25 bot)
+  useEffect(() => {
+    if (messages.length > 50) {
+      setMessages((prev) => prev.slice(-50));
+    }
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -175,8 +182,20 @@ export default function HomePage() {
               <Bot className="size-5 text-muted-foreground" />
               <div className="font-medium">Chat</div>
               {loading ? (
-                <div className="ml-auto text-xs text-muted-foreground">Thinking…</div>
+                <div className="text-xs text-muted-foreground animate-pulse">Thinking…</div>
               ) : null}
+              {messages.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMessages([])}
+                  disabled={loading}
+                  className="ml-auto h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="size-3.5" />
+                  Clear chat
+                </Button>
+              )}
             </div>
 
             <ScrollArea className="flex-1 min-h-0 px-5 py-4">

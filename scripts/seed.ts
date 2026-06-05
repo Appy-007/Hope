@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
-import { upsertDocuments } from "@/lib/vectorDb";
+import { upsertDocuments } from "../src/lib/vectorDb";
 
-// Default documents loaded from Kolkata ARC NGO details and stray animal care guides
 const DEFAULT_DOCUMENTS = [
   "Animal Rescue and Care (PFA Kolkata - ARC) is a Kolkata-based NGO registered under the Trust Act in 2016 that has been working for the welfare of stray animals and their rights. Somak Chatterjee and Titas Mukherjee have been running this shelter-cum-hospital since 2014. The main objective of the organization is to create a better world for our voiceless friends by spreading awareness, defending animal rights, and fostering coexistence.",
   "ARC provides medical care, treatment, adequate care, and a safe refuge for ill, injured, or abused street dogs and cats. They also run a rehabilitation center and provide a permanent home for senior, abandoned, and differently-abled street dogs, as well as puppies requiring long-term treatment and care.",
@@ -22,7 +20,7 @@ const DEFAULT_DOCUMENTS = [
 async function embedText(text: string): Promise<number[]> {
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   if (!apiKey) {
-    throw new Error("GOOGLE_GENERATIVE_AI_API_KEY is not set.");
+    throw new Error("GOOGLE_GENERATIVE_AI_API_KEY is not set in the environment.");
   }
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent?key=${apiKey}`,
@@ -49,39 +47,31 @@ async function embedText(text: string): Promise<number[]> {
   return data.embedding.values as number[];
 }
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json().catch(() => ({}));
-    const docs = Array.isArray(body.documents) && body.documents.length > 0
-      ? body.documents
-      : DEFAULT_DOCUMENTS;
+async function main() {
+  console.log(`Starting seeding process for ${DEFAULT_DOCUMENTS.length} documents...`);
 
-    console.log(`Indexing ${docs.length} documents into SQLite...`);
-
-    const embeddings: number[][] = [];
-    for (let i = 0; i < docs.length; i++) {
-      console.log(`Embedding document ${i + 1}/${docs.length}...`);
-      const vector = await embedText(docs[i]);
+  const embeddings: number[][] = [];
+  for (let i = 0; i < DEFAULT_DOCUMENTS.length; i++) {
+    console.log(`Generating embedding for document ${i + 1}/${DEFAULT_DOCUMENTS.length}...`);
+    try {
+      const vector = await embedText(DEFAULT_DOCUMENTS[i]);
       embeddings.push(vector);
+    } catch (err) {
+      console.error(`Error embedding document ${i + 1}:`, err);
+      process.exit(1);
     }
+  }
 
-    const ids = docs.map((_: string, idx: number) => `doc_${Date.now()}_${idx}`);
-    const metadatas = docs.map(() => ({ source: "kolkata_ngo_web" }));
+  const ids = DEFAULT_DOCUMENTS.map((_, idx) => `doc_${Date.now()}_${idx}`);
+  const metadatas = DEFAULT_DOCUMENTS.map(() => ({ source: "kolkata_ngo_web" }));
 
-    // Upsert into SQLite
-    upsertDocuments(ids, embeddings, docs, metadatas);
-
-    return NextResponse.json({
-      success: true,
-      message: `Successfully indexed ${docs.length} documents into SQLite.`,
-      ids,
-    });
-  } catch (error: unknown) {
-    console.error("Indexing failed:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to index documents";
-    return NextResponse.json(
-      { success: false, error: errorMessage },
-      { status: 500 }
-    );
+  try {
+    upsertDocuments(ids, embeddings, DEFAULT_DOCUMENTS, metadatas);
+    console.log("Seeding complete! Database successfully populated in hope.db.");
+  } catch (err) {
+    console.error("Failed to insert documents into database:", err);
+    process.exit(1);
   }
 }
+
+main();
