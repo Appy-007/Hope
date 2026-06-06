@@ -2,9 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Bot, SendHorizonal, Sparkles } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Bot, SendHorizonal, Sparkles, Trash2 } from "lucide-react";
+
+const MarkdownRenderer = dynamic(() => import("./MarkdownRenderer"), {
+  ssr: false,
+  loading: () => <span className="animate-pulse">Loading...</span>,
+});
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,46 +35,6 @@ const faqData = [
 
 const fuse = new Fuse(faqData, { keys: ["question"], threshold: 0.4 });
 
-function isStrayAnimalRelated(message: string) {
-  const text = message.toLowerCase();
-  const keywords = [
-    "stray",
-    "street dog",
-    "street cat",
-    "dog",
-    "puppy",
-    "cat",
-    "kitten",
-    "rabies",
-    "bite",
-    "wound",
-    "injury",
-    "bleeding",
-    "limp",
-    "vomit",
-    "diarrhea",
-    "not eating",
-    "weak",
-    "fever",
-    "mange",
-    "ticks",
-    "fleas",
-    "deworm",
-    "spay",
-    "neuter",
-    "steril",
-    "vaccin",
-    "food",
-    "water",
-    "rescue",
-    "ngo",
-    "ambulance",
-    "vet",
-    "animal",
-  ];
-  return keywords.some((k) => text.includes(k));
-}
-
 export default function HomePage() {
   const [messages, setMessages] = useState<
     { id: string; role: "user" | "bot"; text: string }[]
@@ -93,31 +57,53 @@ export default function HomePage() {
     listRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
 
+  // Keep only the last 50 messages (25 user, 25 bot)
+  useEffect(() => {
+    if (messages.length > 50) {
+      setMessages((prev) => prev.slice(-50));
+    }
+  }, [messages]);
+
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const text = input.trim();
-
-    if (!isStrayAnimalRelated(text)) {
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), role: "user", text },
-        {
-          id: crypto.randomUUID(),
-          role: "bot",
-          text:
-            "I can only help with **stray animal care** (dogs/cats) — first-aid, feeding, safety, and when to contact an NGO/vet.\n\nPlease rephrase with the animal details (dog/cat, symptoms, and your Kolkata area/landmark).",
-        },
-      ]);
-      setInput("");
-      return;
-    }
 
     setMessages((prev) => [
       ...prev,
       { id: crypto.randomUUID(), role: "user", text },
     ]);
     setLoading(true);
+    setInput("");
+
+    // Step 0: Check Relevancy via API
+    try {
+      const relRes = await fetch("/api/chat/relevancy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+      if (relRes.ok) {
+        const { relevant } = await relRes.json();
+        if (!relevant) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: crypto.randomUUID(),
+              role: "bot",
+              text:
+                "I can only help with **stray animal care** (dogs/cats) — first-aid, feeding, safety, and when to contact an NGO/vet.\n\nPlease rephrase with the animal details (dog/cat, symptoms, and your Kolkata area/landmark).",
+            },
+          ]);
+          setLoading(false);
+          return;
+        }
+      } else {
+        console.warn("Relevancy API returned non-OK status, proceeding anyway.");
+      }
+    } catch (error) {
+      console.error("Relevancy check failed, proceeding anyway.", error);
+    }
 
     // Step 1: Local FAQ
     const result = fuse.search(text);
@@ -126,29 +112,40 @@ export default function HomePage() {
         ...prev,
         { id: crypto.randomUUID(), role: "bot", text: result[0].item.answer },
       ]);
-      setInput("");
       setLoading(false);
       return;
     }
 
-    // Step 2: Hugging Face API Fallback
+    // Step 2: AI Response Fallback
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
       });
+
       const data = await res.json();
+
+      if (!res.ok) {
+        const errMsg = data.error || "Something went wrong. Please try again.";
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), role: "bot", text: errMsg },
+        ]);
+        setLoading(false);
+        return;
+      }
+
       const botReply =
         data?.generated_text ||
-        data?.error ||
         "Sorry — I couldn’t generate a helpful answer. Try rephrasing, or contact a nearby NGO.";
 
       setMessages((prev) => [
         ...prev,
         { id: crypto.randomUUID(), role: "bot", text: botReply },
       ]);
-    } catch {
+    } catch (error) {
+      console.error("AI response fetch error:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -159,7 +156,6 @@ export default function HomePage() {
       ]);
     }
 
-    setInput("");
     setLoading(false);
   };
 
@@ -186,8 +182,20 @@ export default function HomePage() {
               <Bot className="size-5 text-muted-foreground" />
               <div className="font-medium">Chat</div>
               {loading ? (
-                <div className="ml-auto text-xs text-muted-foreground">Thinking…</div>
+                <div className="text-xs text-muted-foreground animate-pulse">Thinking…</div>
               ) : null}
+              {messages.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setMessages([])}
+                  disabled={loading}
+                  className="ml-auto h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="size-3.5" />
+                  Clear chat
+                </Button>
+              )}
             </div>
 
             <ScrollArea className="flex-1 min-h-0 px-5 py-4">
@@ -211,9 +219,7 @@ export default function HomePage() {
                       }`}
                     >
                       {msg.role === "bot" ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {msg.text}
-                        </ReactMarkdown>
+                        <MarkdownRenderer content={msg.text} />
                       ) : (
                         msg.text
                       )}

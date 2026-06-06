@@ -93,5 +93,165 @@ export const KOLKATA_NGOS: Ngo[] = [
     location: { lat: 22.4782455, lng: 87.6956978 },
     tags: ["rescue", "clinic", "sterilization", "vaccination", "shelter"],
   },
+  {
+    id: "kolkata-dog-lovers",
+    name: "Kolkata Dog Lovers",
+    description:
+      "Volunteer-driven dog rescue and adoption network working across Kolkata, helping with rehoming, rescue coordination, and community support.",
+    address:
+      "38/1/2B Girish Mukherjee Road, Bhowanipore, Kolkata, West Bengal 700025",
+    areaHint: "Bhowanipore",
+    phone: "+917044381010",
+    email: "",
+    website: "",
+    location: {lat: 22.5299433,lng: 88.3459905},
+    tags: [
+      "adoption",
+      "dog-rescue",
+      "community",
+      "foster",
+      "rehoming"
+    ]
+  },
+   {
+    id: "wild-animal-rescue-transit-facility-centre",
+    name: "Wild Animal Rescue & Transit Facility Centre",
+    description:
+      "Wildlife rescue service",
+    address:
+      "AE-389, Canal Side Rd, AE Block, Sector 1, Bidhannagar, Kolkata, West Bengal 700064",
+    areaHint: "Bidhannagar",
+    phone: "033 2334 0234",
+    email: "",
+    website: "",
+    location: {lat: 22.6024426,lng:88.4138994},
+    tags: [
+      "wildlife rescue",
+      "rescue",
+    ]
+  },
+  {
+    id: "a1-animals-come-first",
+    name: "A1 - Animals Come First ",
+    description:
+      "A1 - Animals Come First is a non-profit animal welfare NGO based in Kolkata.",
+    address:
+      "Barasat II BDO Office, Bagbanda saiberiya, Barasat, Kolkata, West Bengal 700128",
+    areaHint: "Barasat",
+    phone: "096810 16999",
+    email: "kamalikadey2020@gmail.com",
+    website: "",
+    location: {lat: 22.6629239,lng: 88.5117041},
+    tags: [
+      "adoption",
+      "rescue",
+    ]
+  },
+  {
+    id: "puja-pet-rescue",
+    name: "Puja pet rescue",
+    description:
+      "Puja Pet Rescue is a non-profit animal welfare NGO based in Kolkata.",
+    address:
+      "Pathak Para Rd, Naskarpur, Behala, Kolkata, West Bengal 700060",
+    areaHint: "Behala",
+    phone: "07439966003",
+    email: "",
+    website: "",
+    location: {lat: 22.5072089,lng: 88.3154069},
+    tags: [
+      "adoption",
+      "rescue",
+    ]
+  },
+  {
+    id: "calcutta-pinjrapole-society",
+    name: "Calcutta Pinjrapole Society",
+    description:
+      "Calcutta Pinjrapole society was established in the year 1885 by the eminent persons of society from Kolkata for the shelter of motherly Cows.",
+    address:
+      "34, Armenian Street, Kolkata, India, West Bengal",
+    areaHint: "Armenian Street",
+    phone: "90388 13142",
+    email: "",
+    website: "",
+    location: {lat: 22.5796456,lng: 88.334572},
+    tags: [
+      "shelter",
+      "rescue",
+    ]
+  },
+  {
+    id: "sac-org",
+    name: "S.A.C.Org",
+    description:
+      "S.A.C is a non-profit animal welfare organization located in Kolkata.",
+    address:
+      "Dunlop, Satin Sen Nagar, Baranagar, West Bengal 700108",
+    areaHint: "Baranagar",
+    phone: "06291935982",
+    email: "",
+    website: "",
+    location: {lat: 22.6482376,lng: 88.3858617},
+    tags: [
+      "shelter",
+      "rescue",
+    ]
+  },
+   {
+    id: "nirbakanna-org",
+    name: "Nirbakanna Org",
+    description:
+      "A small attempt to feed animals with better treatment. We are a dedicated animal welfare NGO based in Birbhum, West Bengal, focused on rescuing, caring and for finding loving homes for street dogs.",
+    address:
+      "Chandni Para, Suri, Birbhum, West Bengal, India, 731101",
+    areaHint: "Suri",
+    phone: "+91 97354 61229",
+    email: "surinirbakannawelfaresocietyni@gmail.com",
+    website: "https://nirbakanna.org/",
+    location: {lat: 23.91101,lng: 87.5286901},
+    tags: [
+      "rescue",
+      "adoption",
+      "feeding",
+      "treatment"
+    ]
+  },
+  {
+    id: "comfy-pet-dog-creche",
+    name: "Comfy Pet Dog Creche",
+    description:
+      "Animal Creche",
+    address:
+      "1no, airport gate, 382, PK Guha Rd, Arabinda Sarani, Rajbari, Dum Dum, Kolkata, West Bengal 700028",
+    areaHint: "Dum Dum",
+    phone: "08240579832",
+    email: "",
+    website: "",
+    location: {lat: 22.6426683,lng: 88.139252},
+    tags: [
+      "pet animal creche",
+    ]
+  },
+  {
+    id: "domjur-aastha-animal-welfare-society",
+    name: "Domjur Aastha Animal Welfare Society",
+    description:
+      "An initiative to rescue stray animals and create a better and positive environment for those who cannot speak",
+    address:
+      "Industrial Ested, Lakshmanpur, Kona, Howrah, West Bengal 711114",
+    areaHint: "Domjur",
+    phone: "09748006496",
+    email: "",
+    website: "",
+    location: {lat: 22.6327971,lng: 87.9907896},
+    tags: [
+      "rescue",
+      "treatment"
+    ]
+  },
+  
+  
+  
 ];
 

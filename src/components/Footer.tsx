@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Mail, MapPin, MessageCircle, Github } from "lucide-react";
+import { Heart, MapPin, MessageCircle, Link as LinkIcon } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -25,13 +25,13 @@ export default function Footer() {
             {/* Social / Info Links */}
             <div className="flex items-center gap-3.5 mt-2">
               <a 
-                href="https://github.com" 
+                href="https://apratim-portfolio.vercel.app/" 
                 target="_blank" 
                 rel="noreferrer" 
                 className="rounded-full p-2 bg-background hover:bg-accent hover:text-foreground border transition-all hover:scale-105"
                 aria-label="GitHub"
               >
-                <Github className="size-4" />
+                <LinkIcon className="size-4" />
               </a>
               <Link 
                 href="/chatbot"
@@ -40,13 +40,6 @@ export default function Footer() {
               >
                 <MessageCircle className="size-4" />
               </Link>
-              <a 
-                href="mailto:contact@hope-kolkata.org" 
-                className="rounded-full p-2 bg-background hover:bg-accent hover:text-foreground border transition-all hover:scale-105"
-                aria-label="Email support"
-              >
-                <Mail className="size-4" />
-              </a>
             </div>
           </div>
 
@@ -113,12 +106,6 @@ export default function Footer() {
                 <MapPin className="size-4 text-primary shrink-0 mt-0.5" />
                 <span>Kolkata, West Bengal, India</span>
               </div>
-              <div className="flex items-center gap-2.5">
-                <Mail className="size-4 text-primary shrink-0" />
-                <a href="mailto:info@hope-animalcare.org" className="hover:text-foreground transition-colors break-all">
-                  info@hope-animalcare.org
-                </a>
-              </div>
               <div className="text-xs border-l-2 border-primary/50 pl-3 italic py-0.5">
                 Hope is an open platform aggregating rescue contacts. Please contact specific NGOs directly for emergencies.
               </div>
@@ -132,7 +119,7 @@ export default function Footer() {
       <div className="border-t bg-muted/60 py-6 text-xs text-muted-foreground/80">
         <div className="mx-auto max-w-6xl px-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-center sm:text-left">
           <div>
-            &copy; {currentYear} Hope. All rights reserved. Registered under Animal Welfare Aggregator guides.
+            &copy; {currentYear} Hope. All rights reserved. Demo site for learning purposes.
           </div>
           <div className="flex items-center justify-center gap-1.5 text-foreground/70">
             <span>Made with</span>

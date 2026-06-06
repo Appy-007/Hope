@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Hope — Kolkata Animal Rescue Finder",
   description:
     "Find nearby animal NGOs in Kolkata and get quick stray animal care guidance.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
