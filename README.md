@@ -91,27 +91,6 @@ graph TD
 - **Caching & Rate Limiting**: [Upstash Redis](https://upstash.com/)
 - **Mail Carrier Service**: [Resend](https://resend.com/)
 
----
-
-## ⚙️ Environment Configuration
-
-Create a `.env` file in the root directory and configure the following parameters:
-
-```env
-# Google Generative AI (Embeddings Engine)
-GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
-
-# Groq Cloud (Chatbot LLM Inference Engine)
-GROQ_API_KEY=your_groq_api_key_here
-
-# Upstash Redis Configuration (Caching & Rate Limiting)
-UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url_here
-UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token_here
-
-# Resend Mail Configuration
-RESEND_API_KEY=your_resend_api_key_here
-NOTIFICATION_EMAIL=your_admin_inbox_email_here
-```
 
 ---
 
